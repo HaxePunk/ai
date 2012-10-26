@@ -2,77 +2,180 @@ package com.haxepunk.path;
 
 import com.haxepunk.masks.Grid;
 import com.haxepunk.path.Heuristic;
+import com.haxepunk.ds.PriorityQueue;
+
+typedef PathOptions = {
+	@:optional public var heuristic:HeuristicFunction;
+	@:optional public var walkDiagonal:Bool;
+	@:optional public var optimizedList:Bool;
+};
 
 class GridPath
 {
 
-	public function new(grid:Grid, ?heuristic:HeuristicFunction)
+	public function new(grid:Grid, ?options:PathOptions)
 	{
-		this.grid = grid;
-		this.openList = new Array<PathNode>();
-		this.closedList = new Array<PathNode>();
+		nodes = new Array<Array<PathNode>>();
+		openList = new PriorityQueue<PathNode>();
+		closedList = new Array<PathNode>();
 
-		if (heuristic == null)
+		// build node list
+		var w = Std.int(grid.width / grid.tileWidth);
+		var h = Std.int(grid.height / grid.tileHeight);
+		for (x in 0...w)
 		{
-			this.heuristic = Heuristic.manhattanMethod;
+			nodes[x] = new Array<PathNode>();
+			for (y in 0...h)
+			{
+				var node = new PathNode(x, y);
+				node.walkable = !grid.getTile(x, y);
+				nodes[x].push(node);
+			}
+		}
+
+		// set defaults
+		heuristic = Heuristic.manhattanMethod;
+		walkDiagonal = false;
+		optimizedList = true;
+
+		if (options != null)
+		{
+			if (Reflect.hasField(options, "heuristic"))
+				heuristic = options.heuristic;
+
+			if (Reflect.hasField(options, "walkDiagonal"))
+				walkDiagonal = options.walkDiagonal;
+
+			if (Reflect.hasField(options, "optimizedList"))
+				optimizedList = options.optimizedList;
+		}
+	}
+
+	public inline function checkNeighbor(parent:PathNode, x:Int, y:Int)
+	{
+		var node = getNode(parent.x + x, parent.y + y);
+		if (node == null || !node.walkable || Lambda.has(closedList, node))
+		{
+			return;
 		}
 		else
 		{
-			this.heuristic = heuristic;
-		}
-	}
-
-	public inline function manhattanMethod(node:PathNode)
-	{
-		return Std.int(Math.abs(node.x - destX) + Math.abs(node.y - destY)) * 10;
-	}
-
-	public inline function checkNode(node:PathNode, x:Int, y:Int)
-	{
-		if (grid.getTile(node.x + x, node.y + y) == false)
-		{
-			var n = new PathNode(node.x + x, node.y + y);
 			var diagonal = (x != 0 && y != 0);
-			n.g = node.g + (diagonal ? 14 : 10);
-			n.h = heuristic(node.x, node.y, destX, destY);
-			n.f = n.g + n.h;
-			n.parent = node;
-			openList.push(n);
+
+			node.g = parent.g + (diagonal ? 14 : 10);
+			node.h = heuristic(parent.x, parent.y, destX, destY) * 10;
+			node.f = node.g + node.h;
+			node.parent = parent;
+
+			// remove the node if it exists on the open list
+			openList.remove(node);
+			// enqueue the node with the new priority
+			openList.enqueue(node, node.f);
 		}
 	}
 
-	public function findPath(sx:Int, sy:Int, dx:Int, dy:Int)
+	public function findPath(sx:Int, sy:Int, dx:Int, dy:Int):Array<PathNode>
 	{
 		destX = dx; destY = dy;
 
 		// push starting node to the open list
-		openList.push(new PathNode(sx, sy));
-		var node = openList.pop();
-		//for (node in openList)
-		{
-			checkNode(node, 1, 1);
-			checkNode(node, 1, 0);
-			checkNode(node, 1,-1);
-			checkNode(node, 0,-1);
-			checkNode(node,-1,-1);
-			checkNode(node,-1, 0);
-			checkNode(node,-1, 1);
-			checkNode(node, 0, 1);
+		var start = getNode(sx, sy);
+		start.parent = null;
+		openList.enqueue(start, 0);
 
+		while (openList.length > 0)
+		{
+			var node:PathNode = openList.dequeue();
+
+			// check if we found the target
+			if (node.x == dx && node.y == dy)
+			{
+				return buildList(node);
+			}
+
+			// push the node to the closed list
 			closedList.push(node);
 
-			openList.remove(node);
+			// check all the neighbors
+			checkNeighbor(node, 1, 0);
+			checkNeighbor(node, 0,-1);
+			checkNeighbor(node,-1, 0);
+			checkNeighbor(node, 0, 1);
+
+			if (walkDiagonal)
+			{
+				checkNeighbor(node, 1, 1);
+				checkNeighbor(node, 1,-1);
+				checkNeighbor(node,-1,-1);
+				checkNeighbor(node,-1, 1);
+			}
 		}
-		trace(openList);
+
+		return null;
+	}
+
+	private inline function calcSlope(a:PathNode, b:PathNode):Float
+	{
+		return (b.y - a.y) / (b.x - a.x);
+	}
+
+	private function buildList(node:PathNode):Array<PathNode>
+	{
+		var path = new Array<PathNode>();
+
+		// optimized list skips nodes with the same slope
+		if (optimizedList)
+		{
+			var slope:Float = 0;
+			while (node != null)
+			{
+				var parent = node.parent;
+				if (parent == null)
+				{
+					path.insert(0, node);
+				}
+				else
+				{
+					var newSlope = calcSlope(node, parent);
+					if (slope != newSlope)
+					{
+						path.insert(0, node);
+						slope = newSlope;
+					}
+				}
+				node = parent;
+			}
+		}
+		else
+		{
+			while (node != null)
+			{
+				path.insert(0, node);
+				node = node.parent;
+			}
+		}
+
+		return path;
+	}
+
+	private inline function getNode(x:Int, y:Int):PathNode
+	{
+		if (x > -1 && x < nodes.length &&
+			y > -1 && y < nodes[x].length)
+			return nodes[x][y];
+		else
+			return null;
 	}
 
 	private var heuristic:HeuristicFunction;
+	private var walkDiagonal:Bool;
+	private var optimizedList:Bool;
 
 	private var destX:Int;
 	private var destY:Int;
 
-	private var grid:Grid;
-	private var openList:Array<PathNode>;
+	private var nodes:Array<Array<PathNode>>;
+	private var openList:PriorityQueue<PathNode>;
 	private var closedList:Array<PathNode>;
 
 }

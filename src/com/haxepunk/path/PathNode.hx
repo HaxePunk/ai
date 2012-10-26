@@ -7,6 +7,7 @@ class PathNode
 	public var g:Int;
 	public var h:Int;
 	public var f:Int;
+	public var walkable:Bool;
 	public var parent:PathNode;
 
 	public function new(x:Int, y:Int, parent:PathNode=null)
@@ -15,12 +16,12 @@ class PathNode
 		this.y = y;
 		this.parent = parent;
 
-		f = g = h = 0;
+		g = h = 0;
 	}
 
 	public function toString():String
 	{
-		return "[pos:" + x + ", " + y + " f:" + f + "]";
+		return "[pos:" + x + ", " + y + "]";
 	}
 
 }
