@@ -5,6 +5,9 @@ typedef PriorityItem<T> = {
 	public var priority:Int;
 };
 
+/**
+ * A priority queue class (stores items in priority order)
+ */
 class PriorityQueue<T>
 {
 
@@ -14,8 +17,7 @@ class PriorityQueue<T>
 	}
 
 	/**
-	 * Adds an item with a priority
-	 * O(log n)
+	 * Adds an item with a priority  O(log n)
 	 */
 	public function enqueue(item:T, priority:Int)
 	{
@@ -35,8 +37,7 @@ class PriorityQueue<T>
 	}
 
 	/**
-	 * Removes the lowest priority item
-	 * O(1)
+	 * Removes the lowest priority item  O(1)
 	 */
 	public function dequeue():T
 	{
@@ -45,8 +46,7 @@ class PriorityQueue<T>
 	}
 
 	/**
-	 * Check if an item exists in the queue
-	 * O(n)
+	 * Check if an item exists in the queue  O(n)
 	 */
 	public function remove(value:T)
 	{
@@ -57,6 +57,18 @@ class PriorityQueue<T>
 				_items.remove(item);
 			}
 		}
+	}
+
+	/**
+	 * Removes all items from the queue
+	 */
+	public function clear()
+	{
+#if (cpp || php)
+		_items.splice(0, _items.length);
+#else
+		untyped _items.length = 0;
+#end
 	}
 
 	/**
@@ -83,6 +95,9 @@ class PriorityQueue<T>
 		return min + Std.int((max - min) / 2);
 	}
 
+	/**
+	 * Search for the index to insert a specific priority  O(log n)
+	 */
 	private function search(priority:Int):Int
 	{
 		var mid:Int, min:Int = 0, max:Int = _items.length - 1;

@@ -1,13 +1,26 @@
 package com.haxepunk.path;
 
-typedef HeuristicFunction = Int->Int->Int->Int->Int;
+typedef HeuristicFunction = Int->Int->Int->Int->Float;
 
+/**
+ * A set of heuristic functions
+ */
 class Heuristic
 {
-	public static function manhattanMethod(x:Int, y:Int, dx:Int, dy:Int):Int
+
+	public static function manhattan(x:Int, y:Int, dx:Int, dy:Int):Float
 	{
-		x = x - dx;
-		y = y - dy;
-		return (x < 0 ? -x : x) + (y < 0 ? -y : y);
+		return Math.abs(x - dx) + Math.abs(y - dy);
 	}
+
+	public static function diagonal(x:Int, y:Int, dx:Int, dy:Int):Float
+	{
+		return Math.max(Math.abs(x - dx), Math.abs(y - dy));
+	}
+
+	public static function euclidian(x:Int, y:Int, dx:Int, dy:Int):Float
+	{
+		return Math.sqrt((x - dx) * (x - dx) + (y - dy) * (y - dy));
+	}
+
 }
