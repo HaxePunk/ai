@@ -25,12 +25,10 @@ class Test extends World
 				walkDiagonal: true
 			});
 		path = astar.findPath(2, 2, 5, 5);
-		trace(path);
 	}
 
 	public override function render()
 	{
-		return;
 		var tileWidth = 16, tileHeight = 16, last = null;
 		for (node in path)
 		{

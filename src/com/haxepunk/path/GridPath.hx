@@ -64,13 +64,12 @@ class GridPath
 
 			node.g = parent.g + (diagonal ? 14 : 10);
 			node.h = heuristic(parent.x, parent.y, destX, destY) * 10;
-			node.f = node.g + node.h;
 			node.parent = parent;
 
 			// remove the node if it exists on the open list
 			openList.remove(node);
 			// enqueue the node with the new priority
-			openList.enqueue(node, node.f);
+			openList.enqueue(node, node.g + node.h);
 		}
 	}
 

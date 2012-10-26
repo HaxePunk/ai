@@ -4,9 +4,10 @@ class PathNode
 {
 	public var x:Int;
 	public var y:Int;
+
 	public var g:Int;
 	public var h:Int;
-	public var f:Int;
+
 	public var walkable:Bool;
 	public var parent:PathNode;
 
