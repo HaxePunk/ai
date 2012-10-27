@@ -17,7 +17,7 @@ class Test extends World
 
 	public override function begin()
 	{
-		grid = new Grid(128, 128, 16, 16);
+		grid = new Grid(1024, 1024, 64, 64);
 		grid.setTile(4, 4, true);
 		grid.setTile(3, 3, true);
 		grid.setTile(4, 3, true);
@@ -26,7 +26,8 @@ class Test extends World
 		grid.setTile(3, 2, true);
 		addMask(grid, "solid");
 		astar = new GridPath(grid, {
-				walkDiagonal: true
+				walkDiagonal: true,
+				optimizedPath: true
 			});
 	}
 
@@ -50,20 +51,34 @@ class Test extends World
 
 	public override function render()
 	{
+		var w = Std.int(grid.width / grid.tileWidth);
+		var h = Std.int(grid.height / grid.tileHeight);
+		for (x in 0...w)
+		{
+			for (y in 0...h)
+			{
+				Draw.rect(x * grid.tileWidth, y * grid.tileHeight,
+						grid.tileWidth, grid.tileHeight,
+						grid.getTile(x, y) ? 0x000000 : 0x444444);
+			}
+		}
+
 		if (path != null)
 		{
-			var tileWidth = 16, tileHeight = 16, last = null;
+			var last = null;
 			for (node in path)
 			{
+				var x = Std.int(node.x * grid.tileWidth + grid.tileWidth / 2),
+					y = Std.int(node.y * grid.tileHeight + grid.tileHeight / 2);
 				if (last != null)
 				{
-					Draw.line(Std.int(last.x * tileWidth + tileWidth / 2),
-						Std.int(last.y * tileHeight + tileHeight / 2),
-						Std.int(node.x * tileWidth + tileWidth / 2),
-						Std.int(node.y * tileHeight + tileHeight / 2));
+					Draw.line(Std.int(last.x * grid.tileWidth + grid.tileWidth / 2),
+						Std.int(last.y * grid.tileHeight + grid.tileHeight / 2),
+						Std.int(node.x * grid.tileWidth + grid.tileWidth / 2),
+						Std.int(node.y * grid.tileHeight + grid.tileHeight / 2));
 				}
-				Draw.circle(Std.int(node.x * tileWidth + tileWidth / 2),
-					Std.int(node.y * tileHeight + tileHeight / 2), 3);
+				Draw.text(node.g + " " + node.h, x, y);
+				Draw.circle(x, y, 3);
 				last = node;
 			}
 		}

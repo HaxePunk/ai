@@ -13,7 +13,7 @@ typedef PathOptions = {
 	/** Allows diagonal movement in path generation (default: false) */
 	@:optional public var walkDiagonal:Bool;
 	/** Generates an optimized path list, removes identical slopes (default:true) */
-	@:optional public var optimizedList:Bool;
+	@:optional public var optimizedPath:Bool;
 };
 
 /**
@@ -23,7 +23,7 @@ class GridPath
 {
 
 	public static inline var HORIZONTAL_COST:Int = 10;
-	public static inline var VERTICAL_COST:Int = 10;
+	public static inline var VERTICAL_COST:Int = 14;
 
 	/**
 	 * Creates a GridPath class
@@ -32,28 +32,26 @@ class GridPath
 	 */
 	public function new(grid:Grid, ?options:PathOptions)
 	{
-		nodes = new Array<Array<PathNode>>();
+		nodes = new Array<PathNode>();
 		openList = new PriorityQueue<PathNode>();
 		closedList = new Array<PathNode>();
 
 		// build node list
-		var w = Std.int(grid.width / grid.tileWidth);
-		var h = Std.int(grid.height / grid.tileHeight);
-		for (x in 0...w)
+		width = Std.int(grid.width / grid.tileWidth);
+		height = Std.int(grid.height / grid.tileHeight);
+		var x:Int, y:Int;
+		for (i in 0...(width * height))
 		{
-			nodes[x] = new Array<PathNode>();
-			for (y in 0...h)
-			{
-				var node = new PathNode(x, y);
-				node.walkable = !grid.getTile(x, y);
-				nodes[x].push(node);
-			}
+			x = i % width;
+			y = Std.int(i / width);
+			nodes[i] = new PathNode(x, y);
+			nodes[i].walkable = !grid.getTile(x, y);
 		}
 
 		// set defaults
 		heuristic = Heuristic.manhattan;
 		walkDiagonal = false;
-		optimizedList = true;
+		optimizedPath = true;
 
 		if (options != null)
 		{
@@ -63,8 +61,8 @@ class GridPath
 			if (Reflect.hasField(options, "walkDiagonal"))
 				walkDiagonal = options.walkDiagonal;
 
-			if (Reflect.hasField(options, "optimizedList"))
-				optimizedList = options.optimizedList;
+			if (Reflect.hasField(options, "optimizedPath"))
+				optimizedPath = options.optimizedPath;
 		}
 	}
 
@@ -80,13 +78,7 @@ class GridPath
 	{
 		destX = dx; destY = dy;
 
-		// clear out any old data we had
-#if (cpp || php)
-		closedList.splice(0,closedList.length);
-#else
-		untyped closedList.length = 0;
-#end
-		openList.clear();
+		reset();
 
 		// push starting node to the open list
 		var start = getNode(sx, sy);
@@ -140,14 +132,18 @@ class GridPath
 		else
 		{
 			var horizontal = (x == 0 || y == 0);
-			node.g = parent.g + (horizontal ? HORIZONTAL_COST : VERTICAL_COST);
-			node.h = Std.int(heuristic(parent.x, parent.y, destX, destY) * HORIZONTAL_COST);
-			node.parent = parent;
+			var g = parent.g + (horizontal ? HORIZONTAL_COST : VERTICAL_COST);
+			if (g < node.g || node.parent == null)
+			{
+				node.g = g;
+				node.h = Std.int(heuristic(parent.x, parent.y, destX, destY) * HORIZONTAL_COST);
+				node.parent = parent;
 
-			// remove the node if it exists on the open list
-			openList.remove(node);
-			// enqueue the node with the new priority
-			openList.enqueue(node, node.g + node.h);
+				// remove the node if it exists on the open list
+				openList.remove(node);
+				// enqueue the node with the new priority
+				openList.enqueue(node, node.g + node.h);
+			}
 		}
 	}
 
@@ -169,26 +165,30 @@ class GridPath
 		var path = new Array<PathNode>();
 
 		// optimized list skips nodes with the same slope
-		if (optimizedList)
+		if (optimizedPath)
 		{
-			var slope:Float = 0;
-			while (node != null)
+			path.push(node);
+			// check if this is the only node
+			if (node.parent != null)
 			{
-				var parent = node.parent;
-				if (parent == null)
+				var slope:Float = calcSlope(node, node.parent);
+				while (node != null)
 				{
-					path.insert(0, node);
-				}
-				else
-				{
-					var newSlope = calcSlope(node, parent);
-					if (slope != newSlope)
+					if (node.parent == null)
 					{
 						path.insert(0, node);
-						slope = newSlope;
 					}
+					else
+					{
+						var newSlope = calcSlope(node, node.parent);
+						if (slope != newSlope)
+						{
+							path.insert(0, node);
+							slope = newSlope;
+						}
+					}
+					node = node.parent;
 				}
-				node = parent;
 			}
 		}
 		else
@@ -203,26 +203,45 @@ class GridPath
 		return path;
 	}
 
+	private function reset()
+	{
+// clear out any old data we had
+#if (cpp || php)
+		closedList.splice(0,closedList.length);
+#else
+		untyped closedList.length = 0;
+#end
+		openList.clear();
+
+		for (i in 0...nodes.length)
+		{
+			nodes[i].parent = null;
+		}
+	}
+
 	/**
 	 * Retrieves a PathNode at a specific index
 	 */
 	private inline function getNode(x:Int, y:Int):PathNode
 	{
-		if (x > -1 && x < nodes.length &&
-			y > -1 && y < nodes[x].length)
-			return nodes[x][y];
-		else
+		var index = y * width + x;
+		if (x < 0 || y < 0 || index >= nodes.length)
 			return null;
+		else
+			return nodes[index];
 	}
 
 	private var heuristic:HeuristicFunction;
 	private var walkDiagonal:Bool;
-	private var optimizedList:Bool;
+	private var optimizedPath:Bool;
 
 	private var destX:Int;
 	private var destY:Int;
 
-	private var nodes:Array<Array<PathNode>>;
+	private var width:Int;
+	private var height:Int;
+
+	private var nodes:Array<PathNode>;
 	private var openList:PriorityQueue<PathNode>;
 	private var closedList:Array<PathNode>;
 
