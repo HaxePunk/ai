@@ -9,6 +9,24 @@ import nme.geom.Point;
 
 class Test extends World
 {
+
+	private static var map = [
+		1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+		1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+		1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,
+		1,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,0,1,1,1,
+		1,0,0,1,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1,
+		1,1,0,1,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1,
+		1,1,0,1,0,0,0,0,1,0,0,1,1,1,0,0,0,0,0,1,
+		1,1,0,0,0,0,0,0,1,0,0,1,1,1,0,0,0,0,0,1,
+		1,0,1,1,0,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,
+		1,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,1,
+		1,0,0,1,1,1,1,0,0,1,1,0,1,0,1,0,1,0,0,1,
+		1,0,0,0,0,1,1,1,0,1,1,0,1,0,1,0,1,0,0,1,
+		1,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,
+		1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+	];
+
 	public function new()
 	{
 		super();
@@ -17,16 +35,19 @@ class Test extends World
 
 	public override function begin()
 	{
-		grid = new Grid(1024, 1024, 64, 64);
-		grid.setTile(4, 4, true);
-		grid.setTile(3, 3, true);
-		grid.setTile(4, 3, true);
-		grid.setTile(2, 5, true);
-		grid.setTile(4, 5, true);
-		grid.setTile(3, 2, true);
+		var ts = 32, w = 20, h = 15;
+		grid = new Grid(w * ts, h * ts, ts, ts);
+		for (y in 0...h)
+		{
+			for (x in 0...w)
+			{
+				grid.setTile(x, y, map[y * w + x] == 1);
+			}
+		}
+
 		addMask(grid, "solid");
 		astar = new GridPath(grid, {
-				walkDiagonal: true,
+				walkDiagonal: false,
 				optimizedPath: true
 			});
 	}
