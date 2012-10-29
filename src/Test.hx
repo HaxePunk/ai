@@ -46,10 +46,7 @@ class Test extends World
 		}
 
 		addMask(grid, "solid");
-		astar = new GridPath(grid, {
-				walkDiagonal: false,
-				optimizedPath: true
-			});
+		astar = new GridPath(grid);
 	}
 
 	public override function update()

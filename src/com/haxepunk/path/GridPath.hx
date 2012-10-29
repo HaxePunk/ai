@@ -4,6 +4,13 @@ import com.haxepunk.masks.Grid;
 import com.haxepunk.path.Heuristic;
 import com.haxepunk.ds.PriorityQueue;
 
+enum PathOptimize
+{
+	NONE;
+	SLOPE_MATCH;
+	LINE_OF_SIGHT;
+}
+
 /**
  * A set of options for pathfinding
  */
@@ -13,7 +20,7 @@ typedef PathOptions = {
 	/** Allows diagonal movement in path generation (default: false) */
 	@:optional public var walkDiagonal:Bool;
 	/** Generates an optimized path list, removes identical slopes (default:true) */
-	@:optional public var optimizedPath:Bool;
+	@:optional public var optimize:PathOptimize;
 };
 
 /**
@@ -50,8 +57,8 @@ class GridPath
 
 		// set defaults
 		heuristic = Heuristic.manhattan;
+		optimize = PathOptimize.SLOPE_MATCH;
 		walkDiagonal = false;
-		optimizedPath = true;
 
 		if (options != null)
 		{
@@ -61,8 +68,8 @@ class GridPath
 			if (Reflect.hasField(options, "walkDiagonal"))
 				walkDiagonal = options.walkDiagonal;
 
-			if (Reflect.hasField(options, "optimizedPath"))
-				optimizedPath = options.optimizedPath;
+			if (Reflect.hasField(options, "optimize"))
+				optimize = options.optimize;
 		}
 	}
 
@@ -165,39 +172,44 @@ class GridPath
 		var path = new Array<PathNode>();
 
 		// optimized list skips nodes with the same slope
-		if (optimizedPath)
+		switch (optimize)
 		{
-			path.push(node);
-			// check if this is the only node
-			if (node.parent != null)
-			{
-				var slope:Float = calcSlope(node, node.parent);
+			case NONE:
 				while (node != null)
 				{
-					if (node.parent == null)
-					{
-						path.insert(0, node);
-					}
-					else
-					{
-						var newSlope = calcSlope(node, node.parent);
-						if (slope != newSlope)
-						{
-							path.insert(0, node);
-							slope = newSlope;
-						}
-					}
+					path.insert(0, node);
 					node = node.parent;
 				}
-			}
-		}
-		else
-		{
-			while (node != null)
-			{
-				path.insert(0, node);
-				node = node.parent;
-			}
+			case SLOPE_MATCH:
+				path.push(node);
+				// check if this is the only node
+				if (node.parent != null)
+				{
+					var slope:Float = calcSlope(node, node.parent);
+					while (node != null)
+					{
+						if (node.parent == null)
+						{
+							path.insert(0, node);
+						}
+						else
+						{
+							var newSlope = calcSlope(node, node.parent);
+							if (slope != newSlope)
+							{
+								path.insert(0, node);
+								slope = newSlope;
+							}
+						}
+						node = node.parent;
+					}
+				}
+			case LINE_OF_SIGHT:
+				path.push(node);
+				if (node.parent != null)
+				{
+
+				}
 		}
 
 		return path;
@@ -233,7 +245,7 @@ class GridPath
 
 	private var heuristic:HeuristicFunction;
 	private var walkDiagonal:Bool;
-	private var optimizedPath:Bool;
+	private var optimize:PathOptimize;
 
 	private var destX:Int;
 	private var destY:Int;

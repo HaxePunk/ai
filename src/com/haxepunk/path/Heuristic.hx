@@ -8,17 +8,17 @@ typedef HeuristicFunction = Int->Int->Int->Int->Float;
 class Heuristic
 {
 
-	public static function manhattan(x:Int, y:Int, dx:Int, dy:Int):Float
+	public static inline function manhattan(x:Int, y:Int, dx:Int, dy:Int):Float
 	{
 		return Math.abs(x - dx) + Math.abs(y - dy);
 	}
 
-	public static function diagonal(x:Int, y:Int, dx:Int, dy:Int):Float
+	public static inline function diagonal(x:Int, y:Int, dx:Int, dy:Int):Float
 	{
 		return Math.max(Math.abs(x - dx), Math.abs(y - dy));
 	}
 
-	public static function euclidian(x:Int, y:Int, dx:Int, dy:Int):Float
+	public static inline function euclidian(x:Int, y:Int, dx:Int, dy:Int):Float
 	{
 		return Math.sqrt((x - dx) * (x - dx) + (y - dy) * (y - dy));
 	}

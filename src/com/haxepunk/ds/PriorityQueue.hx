@@ -1,6 +1,6 @@
 package com.haxepunk.ds;
 
-typedef PriorityItem<T> = {
+private typedef PriorityItem<T> = {
 	public var value:T;
 	public var priority:Int;
 };
