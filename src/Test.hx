@@ -1,7 +1,7 @@
 import com.haxepunk.World;
 import com.haxepunk.masks.Grid;
-import com.haxepunk.path.GridPath;
-import com.haxepunk.path.PathNode;
+import com.haxepunk.ai.GridPath;
+import com.haxepunk.ai.PathNode;
 import com.haxepunk.utils.Draw;
 import com.haxepunk.utils.Input;
 

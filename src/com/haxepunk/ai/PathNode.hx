@@ -1,4 +1,4 @@
-package com.haxepunk.path;
+package com.haxepunk.ai;
 
 class PathNode
 {
