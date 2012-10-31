@@ -81,7 +81,7 @@ class GridPath
 	 * @param dy the destination y coordinate
 	 * @return a list of nodes from the start to finish
 	 */
-	public function findPath(sx:Int, sy:Int, dx:Int, dy:Int):Array<PathNode>
+	public function search(sx:Int, sy:Int, dx:Int, dy:Int):Array<PathNode>
 	{
 		destX = dx; destY = dy;
 
