@@ -143,7 +143,7 @@ class GridPath
 			if (g < node.g || node.parent == null)
 			{
 				node.g = g;
-				node.h = Std.int(heuristic(parent.x, parent.y, destX, destY) * HORIZONTAL_COST);
+				node.h = Std.int(heuristic(node.x, node.y, destX, destY) * HORIZONTAL_COST);
 				node.parent = parent;
 
 				// remove the node if it exists on the open list
