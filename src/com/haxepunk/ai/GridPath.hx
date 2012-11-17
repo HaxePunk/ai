@@ -236,11 +236,10 @@ class GridPath
 	 */
 	private inline function getNode(x:Int, y:Int):PathNode
 	{
-		var index = y * width + x;
-		if (x < 0 || y < 0 || index >= nodes.length)
+		if (x < 0 || y < 0 || x >= width || y >= height)
 			return null;
 		else
-			return nodes[index];
+			return nodes[y * width + x];
 	}
 
 	private var heuristic:HeuristicFunction;
