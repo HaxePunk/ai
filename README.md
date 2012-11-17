@@ -1,5 +1,5 @@
 ## How to use
-`haxe
+```haxe
 import com.haxepunk.ai.GridPath;
 import com.haxepunk.Entity;
 import com.haxepunk.masks.Grid;
@@ -41,4 +41,4 @@ class PathEntity extends Entity
 	var current:PathNode;
 	var nodes:Array<PathNode>;
 }
-`
+```
