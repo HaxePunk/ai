@@ -6,9 +6,9 @@ import com.haxepunk.ds.PriorityQueue;
 
 enum PathOptimize
 {
-	NONE;
-	SLOPE_MATCH;
-	LINE_OF_SIGHT;
+	None;
+	SlopeMatch;
+	LineOfSight;
 }
 
 /**
@@ -57,7 +57,7 @@ class GridPath
 
 		// set defaults
 		heuristic = Heuristic.manhattan;
-		optimize = PathOptimize.SLOPE_MATCH;
+		optimize = PathOptimize.SlopeMatch;
 		walkDiagonal = false;
 
 		if (options != null)
@@ -174,13 +174,13 @@ class GridPath
 		// optimized list skips nodes with the same slope
 		switch (optimize)
 		{
-			case NONE:
+			case None:
 				while (node != null)
 				{
 					path.insert(0, node);
 					node = node.parent;
 				}
-			case SLOPE_MATCH:
+			case SlopeMatch:
 				path.push(node);
 				// check if this is the only node
 				if (node.parent != null)
@@ -204,7 +204,7 @@ class GridPath
 						node = node.parent;
 					}
 				}
-			case LINE_OF_SIGHT:
+			case LineOfSight:
 				path.push(node);
 				var current = node;
 				while (node.parent != null)
