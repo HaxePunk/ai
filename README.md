@@ -36,7 +36,7 @@ class PathEntity extends Entity
 		if (path != null && path.length > 0)
 		{
 			targetNode = path.shift();
-			pathTween.setMotionSpeed(x, y, targetNode.x * 16 + 8, targetNode.y * 16 + 8, 150);
+			pathTween.setMotionSpeed(x, y, targetNode.worldX, targetNode.worldY, 150);
 		}
 	}
 

@@ -46,13 +46,18 @@ class GridPath
 		// build node list
 		width = grid.columns;
 		height = grid.rows;
-		var x:Int, y:Int;
+		var x:Int, y:Int, node:PathNode;
 		for (i in 0...(width * height))
 		{
 			x = i % width;
 			y = Std.int(i / width);
-			nodes[i] = new PathNode(x, y);
-			nodes[i].walkable = !grid.getTile(x, y);
+			node = new PathNode(x, y);
+			// center world coordinate in cell
+			node.worldX = x * grid.tileWidth + grid.tileWidth / 2;
+			node.worldY = y * grid.tileWidth + grid.tileWidth / 2;
+			// determine walkable based on grid value
+			node.walkable = !grid.getTile(x, y);
+			nodes[i] = node;
 		}
 
 		// set defaults

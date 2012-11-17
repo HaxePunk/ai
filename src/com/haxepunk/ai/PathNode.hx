@@ -4,6 +4,8 @@ class PathNode
 {
 	public var x:Int;
 	public var y:Int;
+	public var worldX:Float;
+	public var worldY:Float;
 
 	public var g:Int;
 	public var h:Int;
