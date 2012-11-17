@@ -90,6 +90,10 @@ class GridPath
 	{
 		destX = dx; destY = dy;
 
+		// early out if this area is blocked
+		var dest = getNode(dx, dy);
+		if (dest == null || dest.walkable == false) return null;
+
 		reset();
 
 		// push starting node to the open list
