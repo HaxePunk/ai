@@ -44,8 +44,8 @@ class GridPath
 		closedList = new Array<PathNode>();
 
 		// build node list
-		width = Std.int(grid.width / grid.tileWidth);
-		height = Std.int(grid.height / grid.tileHeight);
+		width = grid.columns;
+		height = grid.rows;
 		var x:Int, y:Int;
 		for (i in 0...(width * height))
 		{
@@ -206,13 +206,61 @@ class GridPath
 				}
 			case LINE_OF_SIGHT:
 				path.push(node);
-				if (node.parent != null)
+				var current = node;
+				while (node.parent != null)
 				{
-
+					// a bit stupid to check the same nodes every time, but I can't figure out a better way to do it...
+					if (!hasLineOfSight(current, node.parent))
+					{
+						path.insert(0, node);
+						current = node;
+					}
+					node = node.parent;
 				}
+				path.insert(0, node); // last node
 		}
 
 		return path;
+	}
+
+	private inline function hasLineOfSight(a:PathNode, b:PathNode):Bool
+	{
+		var dx = abs(b.x - a.x);
+		var dy = abs(b.y - a.y);
+		var x = a.x;
+		var y = a.y;
+		var n = 1 + dx + dy;
+		var xInc = (b.x == a.x) ? 0 : (b.x > a.x) ? 1 : -1;
+		var yInc = (b.y == a.y) ? 0 : (b.y > a.y) ? 1 : -1;
+		var error = dx - dy;
+		dx *= 2;
+		dy *= 2;
+
+		while (n-- > 0)
+		{
+			var node = getNode(x, y);
+			if (node == null || node.walkable == false)
+			{
+				return false;
+			}
+
+			if (error > 0)
+			{
+				x += xInc;
+				error -= dy;
+			}
+			else
+			{
+				y += yInc;
+				error += dx;
+			}
+		}
+		return true;
+	}
+
+	private inline function abs(value:Int):Int
+	{
+		return value < 0 ? -value : value;
 	}
 
 	private function reset()
