@@ -242,6 +242,7 @@ class GridPath
 		var xInc = (b.x == a.x) ? 0 : (b.x > a.x) ? 1 : -1;
 		var yInc = (b.y == a.y) ? 0 : (b.y > a.y) ? 1 : -1;
 		var error = dx - dy;
+		var canSee = true;
 		dx *= 2;
 		dy *= 2;
 
@@ -250,7 +251,8 @@ class GridPath
 			var node = getNode(x, y);
 			if (node == null || node.walkable == false)
 			{
-				return false;
+				canSee = false;
+				break;
 			}
 
 			if (error > 0)
@@ -264,7 +266,7 @@ class GridPath
 				error += dx;
 			}
 		}
-		return true;
+		return canSee;
 	}
 
 	private inline function abs(value:Int):Int

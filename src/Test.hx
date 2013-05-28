@@ -61,7 +61,7 @@ class Test extends World
 			}
 			else
 			{
-				path = astar.findPath(Std.int(start.x), Std.int(start.y), Std.int(x), Std.int(y));
+				path = astar.search(Std.int(start.x), Std.int(start.y), Std.int(x), Std.int(y));
 				start = null;
 			}
 		}

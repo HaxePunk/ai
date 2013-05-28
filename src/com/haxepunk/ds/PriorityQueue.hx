@@ -84,8 +84,8 @@ class PriorityQueue<T>
 		return "[" + items.join(", ") + "]";
 	}
 
-	public var length(getLength, never):Int;
-	private function getLength():Int
+	public var length(get_length, never):Int;
+	private function get_length():Int
 	{
 		return _items.length;
 	}
