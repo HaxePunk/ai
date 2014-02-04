@@ -1,13 +1,13 @@
-import com.haxepunk.ai.steer.Steer;
+import com.haxepunk.ai.steer.Vehicle;
 
 class TestSteering extends haxe.unit.TestCase
 {
 	public function testSeek()
 	{
-		var a = new Steer(),
-			b = new Steer(5, 7);
+		var a = new Vehicle(),
+			b = new Vehicle(5, 7);
 		a.maxVelocity = 5;
-		a.flee(b);
+		a.flee(b.position);
 		assertTrue(true);
 	}
 }

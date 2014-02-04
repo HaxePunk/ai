@@ -16,11 +16,13 @@ abstract Vector2D(Point)
 {
 	public inline function new(x:Float, y:Float) { this = new Point(x, y); }
 
-	public var x(get,never):Float;
+	public var x(get,set):Float;
 	private inline function get_x():Float { return this.x; }
+	private inline function set_x(value:Float):Float { return this.x = value; }
 
-	public var y(get,never):Float;
+	public var y(get,set):Float;
 	private inline function get_y():Float { return this.y; }
+	private inline function set_y(value:Float):Float { return this.y = value; }
 
 	public inline function dot(b:Vector2D):Float {
 		return x * b.x + y * b.y;
