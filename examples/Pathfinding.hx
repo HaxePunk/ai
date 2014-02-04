@@ -1,13 +1,13 @@
-import com.haxepunk.World;
+import com.haxepunk.Scene;
 import com.haxepunk.masks.Grid;
-import com.haxepunk.ai.GridPath;
-import com.haxepunk.ai.PathNode;
+import com.haxepunk.ai.path.GridPath;
+import com.haxepunk.ai.path.PathNode;
 import com.haxepunk.utils.Draw;
 import com.haxepunk.utils.Input;
 
-import nme.geom.Point;
+import flash.geom.Point;
 
-class Test extends World
+class TestScene extends Scene
 {
 
 	private static var map = [
@@ -30,7 +30,6 @@ class Test extends World
 	public function new()
 	{
 		super();
-
 	}
 
 	public override function begin()

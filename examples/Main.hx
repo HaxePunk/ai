@@ -14,7 +14,7 @@ class Main extends Engine
 			HXP.console.enable();
 		}
 #end
-		HXP.world = new Test();
+		HXP.world = new Pathfinding();
 	}
 
 	public static function main()

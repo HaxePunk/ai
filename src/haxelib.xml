@@ -1,9 +1,0 @@
-<project name="HaxePunkAI" url="http://haxepunk.com" license="MIT">
-	<user name="heardtheword" />
-	<tag v="flash" />
-	<tag v="cpp" />
-	<tag v="game" />
-	<tag v="nme" />
-	<description>HaxePunk A* pathfinding</description>
-	<version name="1.0.0">Initial Version</version>
-</project>

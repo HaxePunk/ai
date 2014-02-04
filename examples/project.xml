@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	<meta title="HaxePunk AI" package="com.haxepunk.ai" version="1.0.0" company="HaxePunk" />
+
+ 	<app file="HaxePunk" main="Main" path="bin" />
+
+	<window fps="30" resizable="true" background="0x333333" />
+	<window width="640" height="480" unless="mobile" />
+	<window fullscreen="true" if="mobile" />
+
+	<haxelib name="HaxePunk" />
+	<haxelib name="HaxePunkAI" />
+</project>
