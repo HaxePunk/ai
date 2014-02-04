@@ -1,3 +1,5 @@
+package scenes;
+
 import com.haxepunk.Scene;
 import com.haxepunk.masks.Grid;
 import com.haxepunk.ai.path.GridPath;
@@ -7,7 +9,7 @@ import com.haxepunk.utils.Input;
 
 import flash.geom.Point;
 
-class TestScene extends Scene
+class Pathfinding extends Scene
 {
 
 	private static var map = [

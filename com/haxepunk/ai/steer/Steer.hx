@@ -1,8 +1,9 @@
 package com.haxepunk.ai.steer;
 
+import com.haxepunk.Entity;
 import com.haxepunk.ds.Vector2D;
 
-class Steer
+class Steer extends Entity
 {
 	public var position:Vector2D;
 	public var velocity:Vector2D;
@@ -11,6 +12,7 @@ class Steer
 
 	public function new(x:Float = 0, y:Float = 0)
 	{
+		super(x, y);
 		this.position = new Vector2D(x, y);
 		velocity = new Vector2D(0, 0);
 	}
@@ -26,7 +28,6 @@ class Steer
 		velocity = velocity + steering;
 		// velocity.truncate(maxSpeed);
 		position = position + velocity;
-		trace(position);
 	}
 
 	public function flee(target:Steer)
@@ -40,6 +41,5 @@ class Steer
 		velocity = velocity + steering;
 		// velocity.truncate(maxSpeed);
 		position = position + velocity;
-		trace(position);
 	}
 }

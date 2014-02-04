@@ -1,8 +1,8 @@
 package com.haxepunk.ai.path;
 
 import com.haxepunk.ai.path.Heuristic;
-import com.haxepunk.masks.Grid;
 import com.haxepunk.ds.PriorityQueue;
+import com.haxepunk.masks.Grid;
 
 enum PathOptimize
 {
