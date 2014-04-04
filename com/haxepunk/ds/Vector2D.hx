@@ -32,6 +32,11 @@ abstract Vector2D(Point)
 		return x * b.x - y * b.y;
 	}
 
+	public function clone():Vector2D
+	{
+		return new Vector2D(this.x, this.y);
+	}
+
 	public inline function rotate(angle:Float):Vector2D {
 		var sin:Float = Math.sin(angle),
 			cos:Float = Math.cos(angle);
@@ -53,10 +58,18 @@ abstract Vector2D(Point)
 		return Math.atan2(y, x);
 	}
 
+	public function normalize():Void
+	{
+		var len = length;
+		x /= len;
+		y /= len;
+	}
+
 	public var unit(get,never):Vector2D;
 	public inline function get_unit():Vector2D {
-		var len = length;
-		return new Vector2D(x / len, y / len);
+		var v = clone();
+		v.normalize();
+		return v;
 	}
 
 	@:op(A + B) static public function add(a:Vector2D, b:Vector2D):Vector2D {

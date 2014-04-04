@@ -18,7 +18,7 @@ class Vehicle extends Entity
 		velocity = new Vector2D(0, 0);
 	}
 
-	public function seek(target:Vector2D)
+	public function seek(target:Vector2D):Void
 	{
 		var desiredVelocity = (target - position).unit * maxVelocity;
 
@@ -34,7 +34,7 @@ class Vehicle extends Entity
 		position.y = y;
 	}
 
-	public function flee(target:Vector2D)
+	public function flee(target:Vector2D):Void
 	{
 		var desiredVelocity = (position - target).unit * maxVelocity;
 
@@ -50,9 +50,17 @@ class Vehicle extends Entity
 		position.y = y;
 	}
 
-	public function wander()
+	public function wander(circleDistance=10, circleRadius=10)
 	{
-		var dt = HXP.elapsed;
+		var circleCenter = velocity.clone();
+		circleCenter.normalize();
+		circleCenter *= circleDistance;
+
+		var displacement = new Vector2D(0, -1);
+		displacement *= circleRadius;
+
+		var wanderForce = circleCenter + displacement;
+		return wanderForce;
 	}
 
 	public function separate(flock:Array<Vehicle>)
