@@ -80,15 +80,6 @@ class TestBehaviors extends haxe.unit.TestCase
 		assertEquals(Success, sequence.tick());
 	}
 
-	public function testSelector()
-	{
-		var selector = new Selector();
-		selector.addChild(new MockBehavior());
-		selector.addChild(new MockBehavior(Success));
-		assertEquals(Running, selector.tick());
-		assertEquals(Success, selector.tick());
-	}
-
 	public function testRepeat()
 	{
 		var behavior = new MockBehavior(Success);
@@ -98,9 +89,106 @@ class TestBehaviors extends haxe.unit.TestCase
 		assertEquals(4, behavior.initCalled);
 	}
 
-	public function testParallel()
+	public function testSelectorTwoChildrenContinues()
 	{
+		var b1 = new MockBehavior();
+		var selector = new Selector();
+		selector.addChild(b1);
+		selector.addChild(new MockBehavior());
+
+		assertEquals(Running, selector.tick());
+		assertEquals(0, b1.termCalled);
+
+		b1.returnStatus = Failure;
+		assertEquals(Running, selector.tick());
+		assertEquals(1, b1.termCalled);
+	}
+
+	public function testSelectorTwoChildrenSucceeds()
+	{
+		var b1 = new MockBehavior();
+		var selector = new Selector();
+		selector.addChild(b1);
+		selector.addChild(new MockBehavior());
+
+		assertEquals(Running, selector.tick());
+		assertEquals(0, b1.termCalled);
+
+		b1.returnStatus = Success;
+		assertEquals(Success, selector.tick());
+		assertEquals(1, b1.termCalled);
+	}
+
+	public function testSelectorOneChildPassThrough()
+	{
+		for (status in [Success, Failure])
+		{
+			var b1 = new MockBehavior();
+			var selector = new Selector();
+			selector.addChild(b1);
+
+			assertEquals(Running, selector.tick());
+			assertEquals(0, b1.termCalled);
+
+			b1.returnStatus = status;
+			assertEquals(status, selector.tick());
+			assertEquals(1, b1.termCalled);
+		}
+	}
+
+	public function testParallelSucceedRequireAll()
+	{
+		var b1 = new MockBehavior();
+		var b2 = new MockBehavior();
+		var parallel = new Parallel(RequireAll, RequireOne);
+		parallel.addChild(b1);
+		parallel.addChild(b2);
+
+		assertEquals(Running, parallel.tick());
+		b1.returnStatus = Success;
+		assertEquals(Running, parallel.tick());
+		b2.returnStatus = Success;
+		assertEquals(Success, parallel.tick());
+	}
+
+	public function testParallelSucceedRequireOne()
+	{
+		var b1 = new MockBehavior();
+		var b2 = new MockBehavior();
 		var parallel = new Parallel(RequireOne, RequireAll);
+		parallel.addChild(b1);
+		parallel.addChild(b2);
+
+		assertEquals(Running, parallel.tick());
+		b1.returnStatus = Success;
+		assertEquals(Success, parallel.tick());
+	}
+
+	public function testParallelFailureRequireAll()
+	{
+		var b1 = new MockBehavior();
+		var b2 = new MockBehavior();
+		var parallel = new Parallel(RequireOne, RequireAll);
+		parallel.addChild(b1);
+		parallel.addChild(b2);
+
+		assertEquals(Running, parallel.tick());
+		b1.returnStatus = Failure;
+		assertEquals(Running, parallel.tick());
+		b2.returnStatus = Failure;
+		assertEquals(Failure, parallel.tick());
+	}
+
+	public function testParallelFailureRequireOne()
+	{
+		var b1 = new MockBehavior();
+		var b2 = new MockBehavior();
+		var parallel = new Parallel(RequireAll, RequireOne);
+		parallel.addChild(b1);
+		parallel.addChild(b2);
+
+		assertEquals(Running, parallel.tick());
+		b1.returnStatus = Failure;
 		assertEquals(Failure, parallel.tick());
 	}
 

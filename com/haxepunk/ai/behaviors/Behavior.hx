@@ -43,11 +43,14 @@ class Behavior
 		{
 			initialize();
 		}
+
 		status = update();
+
 		if (status != Running)
 		{
 			terminate(status);
 		}
+
 		return status;
 	}
 
