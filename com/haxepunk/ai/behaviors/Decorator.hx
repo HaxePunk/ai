@@ -5,6 +5,7 @@ class Decorator extends Behavior
 
 	public function new(child:Behavior)
 	{
+		super();
 		this.child = child;
 	}
 

@@ -93,14 +93,16 @@ class TestBehaviors extends haxe.unit.TestCase
 		assertEquals(Success, selector.tick());
 	}
 
-	// public function testRandomSelector()
-	// {
-	// 	var selector = new RandomSelector();
-	// 	assertEquals(Failure, selector.tick());
-	// 	selector.addChild(new MockBehavior());
-	// 	selector.addChild(new MockBehavior());
-	// 	assertEquals(Success, selector.tick());
-	// }
+	public function testRepeat()
+	{
+
+		var behavior = new MockBehavior();
+		behavior.returnStatus = Success;
+		var repeat = new Repeat(behavior);
+		repeat.count = 4;
+		assertEquals(Success, repeat.tick());
+		assertEquals(4, behavior.initCalled);
+	}
 
 	public function testParallel()
 	{
