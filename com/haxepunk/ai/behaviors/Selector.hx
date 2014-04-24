@@ -12,7 +12,8 @@ class Selector extends Composite
 	{
 		while (_current.hasNext())
 		{
-			var status = _current.next().tick();
+			_currentBehavior = _current.next();
+			var status = _currentBehavior.tick();
 
 			if (status != Failure)
 			{
@@ -23,5 +24,6 @@ class Selector extends Composite
 	}
 
 	private var _current:Iterator<Behavior>;
+	private var _currentBehavior:Behavior;
 
 }

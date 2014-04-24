@@ -10,8 +10,8 @@ class Behavior
 		status = Invalid;
 	}
 
-	private function initialize() { }
-	private function terminate(status:BehaviorStatus) { }
+	private function initialize():Void { }
+	private function terminate(status:BehaviorStatus):Void { }
 	private function update():BehaviorStatus { return status; }
 
 	public var terminated(get, never):Bool;
@@ -26,12 +26,12 @@ class Behavior
 		return status == Running;
 	}
 
-	public function reset()
+	public function reset():Void
 	{
 		status = Invalid;
 	}
 
-	public function abort()
+	public function abort():Void
 	{
 		terminate(Aborted);
 		status = Aborted;
