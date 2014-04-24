@@ -1,31 +1,46 @@
 package com.haxepunk.ai.behaviors;
 
+/**
+ * A composite is a collection of behaviors
+ */
 class Composite extends Behavior
 {
+
+	/**
+	 * Composite constructor
+	 */
 	public function new()
 	{
 		super();
-		children = new Array<Behavior>();
+		children = new List<Behavior>();
 	}
 
-	public function addChild(child:Behavior)
+	/**
+	 * Adds a child behavior to the composite
+	 * @param child The behavior to add
+	 */
+	public inline function addChild(child:Behavior)
 	{
-		children.push(child);
+		children.add(child);
 	}
 
-	public function removeChild(child:Behavior)
+	/**
+	 * Removes a child behavior from the composite
+	 * @param child The behavior to remove
+	 */
+	public inline function removeChild(child:Behavior)
 	{
 		children.remove(child);
 	}
 
-	public function clear()
+	/**
+	 * Removes all children from the composite
+	 */
+	public inline function removeAll()
 	{
-		#if (cpp || php)
-			children.splice(0, children.length);
-		#else
-			untyped children.length = 0;
-		#end
+		children.clear();
 	}
 
-	private var children:Array<Behavior>;
+	private var children:List<Behavior>;
+
 }

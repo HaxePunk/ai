@@ -1,5 +1,8 @@
 package com.haxepunk.ai.behaviors;
 
+/**
+ * A decorator contains a single behavior
+ */
 class Decorator extends Behavior
 {
 

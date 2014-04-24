@@ -1,5 +1,8 @@
 package com.haxepunk.ai.behaviors;
 
+/**
+ * A selector chooses the first behavior that doesn't fail
+ */
 class Selector extends Composite
 {
 

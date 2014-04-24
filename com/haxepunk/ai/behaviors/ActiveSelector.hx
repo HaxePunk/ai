@@ -1,5 +1,8 @@
 package com.haxepunk.ai.behaviors;
 
+/**
+ * An active selector
+ */
 class ActiveSelector extends Selector
 {
 

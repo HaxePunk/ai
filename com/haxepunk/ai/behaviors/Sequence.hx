@@ -1,5 +1,8 @@
 package com.haxepunk.ai.behaviors;
 
+/**
+ * A sequence handles behaviors in order and continues until one does not succeed
+ */
 class Sequence extends Composite
 {
 
