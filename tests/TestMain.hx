@@ -7,6 +7,7 @@ class TestMain
 		var r = new TestRunner();
 		r.add(new TestVector());
 		r.add(new TestSteering());
+		r.add(new TestBehaviors());
 		r.run();
 	}
 }

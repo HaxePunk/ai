@@ -3,7 +3,7 @@
 	"url" : "http://haxepunk.com",
 	"license": "MIT",
 	"tags": ["flash", "game", "cpp", "openfl"],
-	"description": "HaxePunk A* pathfinding",
+	"description": "HaxePunk AI library",
 	"version": "1.1.0",
 	"releasenote": "",
 	"contributors": ["heardtheword"],
