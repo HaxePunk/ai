@@ -73,13 +73,6 @@ class TestBehaviors extends haxe.unit.TestCase
 		assertEquals(1, behavior.termCalled);
 	}
 
-	public function testSequence()
-	{
-		var sequence = new Sequence();
-		sequence.addChild(new MockBehavior(Success));
-		assertEquals(Success, sequence.tick());
-	}
-
 	public function testRepeat()
 	{
 		var behavior = new MockBehavior(Success);
@@ -87,6 +80,58 @@ class TestBehaviors extends haxe.unit.TestCase
 		repeat.count = 4;
 		assertEquals(Success, repeat.tick());
 		assertEquals(4, behavior.initCalled);
+	}
+
+	public function testSequenceTwoChildrenFails()
+	{
+		var b1 = new MockBehavior();
+		var b2 = new MockBehavior();
+		var sequence = new Sequence();
+		sequence.addChild(b1);
+		sequence.addChild(b2);
+
+		assertEquals(Running, sequence.tick());
+		assertEquals(0, b1.termCalled);
+
+		b1.returnStatus = Failure;
+		assertEquals(Failure, sequence.tick());
+		assertEquals(1, b1.termCalled);
+		assertEquals(0, b2.initCalled);
+	}
+
+	public function testSequenceTwoChildrenContinues()
+	{
+		var b1 = new MockBehavior();
+		var b2 = new MockBehavior();
+		var sequence = new Sequence();
+		sequence.addChild(b1);
+		sequence.addChild(b2);
+
+		assertEquals(Running, sequence.tick());
+		assertEquals(0, b1.termCalled);
+		assertEquals(0, b2.initCalled);
+
+		b1.returnStatus = Success;
+		assertEquals(Running, sequence.tick());
+		assertEquals(1, b1.termCalled);
+		assertEquals(1, b2.initCalled);
+	}
+
+	public function testSequenceOneChildPassThrough()
+	{
+		for (status in [Success, Failure])
+		{
+			var b1 = new MockBehavior();
+			var sequence = new Sequence();
+			sequence.addChild(b1);
+
+			assertEquals(Running, sequence.tick());
+			assertEquals(0, b1.termCalled);
+
+			b1.returnStatus = status;
+			assertEquals(status, sequence.tick());
+			assertEquals(1, b1.termCalled);
+		}
 	}
 
 	public function testSelectorTwoChildrenContinues()
