@@ -1,14 +1,25 @@
 package com.haxepunk.ai.behaviors;
 
+/**
+ * List of policy types
+ */
 enum Policy
 {
-	RequireOne;
-	RequireAll;
+	RequireOne; /** only requires one behavior to succeed or fail **/
+	RequireAll; /** requires all behaviors to succeed or fail **/
 }
 
+/**
+ * A parallel node processes all child behaviors at once and returns based on the policies provided
+ */
 class Parallel extends Composite
 {
 
+	/**
+	 * Parallel constructor
+	 * @param success The policy for success
+	 * @param failure The policy for failure
+	 */
 	public function new(success:Policy, failure:Policy)
 	{
 		super();

@@ -15,10 +15,10 @@ class MockBehavior extends Behavior
 	public var termStatus(default, null):BehaviorStatus;
 	public var returnStatus:BehaviorStatus;
 
-	public function new()
+	public function new(?status:BehaviorStatus)
 	{
 		super();
-		returnStatus = Running;
+		returnStatus = status == null ? Running : status;
 	}
 
 	override public function initialize()
@@ -73,39 +73,202 @@ class TestBehaviors extends haxe.unit.TestCase
 		assertEquals(1, behavior.termCalled);
 	}
 
-	public function testSequence()
+	public function testRepeat()
 	{
+		var behavior = new MockBehavior(Success);
+		var repeat = new Repeat(behavior, 4);
+		assertEquals(Success, repeat.tick());
+		assertEquals(4, behavior.initCalled);
+	}
+
+	public function testSequenceTwoChildrenFails()
+	{
+		var b1 = new MockBehavior();
+		var b2 = new MockBehavior();
 		var sequence = new Sequence();
-		var behavior = new MockBehavior();
-		behavior.returnStatus = Success;
-		sequence.addChild(behavior);
-		assertEquals(Success, sequence.tick());
+		sequence.addChild(b1);
+		sequence.addChild(b2);
+
+		assertEquals(Running, sequence.tick());
+		assertEquals(0, b1.termCalled);
+
+		b1.returnStatus = Failure;
+		assertEquals(Failure, sequence.tick());
+		assertEquals(1, b1.termCalled);
+		assertEquals(0, b2.initCalled);
 	}
 
-	public function testSelector()
+	public function testSequenceTwoChildrenContinues()
 	{
+		var b1 = new MockBehavior();
+		var b2 = new MockBehavior();
+		var sequence = new Sequence();
+		sequence.addChild(b1);
+		sequence.addChild(b2);
+
+		assertEquals(Running, sequence.tick());
+		assertEquals(0, b1.termCalled);
+		assertEquals(0, b2.initCalled);
+
+		b1.returnStatus = Success;
+		assertEquals(Running, sequence.tick());
+		assertEquals(1, b1.termCalled);
+		assertEquals(1, b2.initCalled);
+	}
+
+	public function testSequenceOneChildPassThrough()
+	{
+		for (status in [Success, Failure])
+		{
+			var b1 = new MockBehavior();
+			var sequence = new Sequence();
+			sequence.addChild(b1);
+
+			assertEquals(Running, sequence.tick());
+			assertEquals(0, b1.termCalled);
+
+			b1.returnStatus = status;
+			assertEquals(status, sequence.tick());
+			assertEquals(1, b1.termCalled);
+		}
+	}
+
+	public function testSelectorTwoChildrenContinues()
+	{
+		var b1 = new MockBehavior();
 		var selector = new Selector();
+		selector.addChild(b1);
 		selector.addChild(new MockBehavior());
-		var behavior = new MockBehavior();
-		behavior.returnStatus = Success;
-		selector.addChild(behavior);
+
 		assertEquals(Running, selector.tick());
-		assertEquals(Success, selector.tick());
+		assertEquals(0, b1.termCalled);
+
+		b1.returnStatus = Failure;
+		assertEquals(Running, selector.tick());
+		assertEquals(1, b1.termCalled);
 	}
 
-	// public function testRandomSelector()
-	// {
-	// 	var selector = new RandomSelector();
-	// 	assertEquals(Failure, selector.tick());
-	// 	selector.addChild(new MockBehavior());
-	// 	selector.addChild(new MockBehavior());
-	// 	assertEquals(Success, selector.tick());
-	// }
-
-	public function testParallel()
+	public function testSelectorTwoChildrenSucceeds()
 	{
+		var b1 = new MockBehavior();
+		var selector = new Selector();
+		selector.addChild(b1);
+		selector.addChild(new MockBehavior());
+
+		assertEquals(Running, selector.tick());
+		assertEquals(0, b1.termCalled);
+
+		b1.returnStatus = Success;
+		assertEquals(Success, selector.tick());
+		assertEquals(1, b1.termCalled);
+	}
+
+	public function testSelectorOneChildPassThrough()
+	{
+		for (status in [Success, Failure])
+		{
+			var b1 = new MockBehavior();
+			var selector = new Selector();
+			selector.addChild(b1);
+
+			assertEquals(Running, selector.tick());
+			assertEquals(0, b1.termCalled);
+
+			b1.returnStatus = status;
+			assertEquals(status, selector.tick());
+			assertEquals(1, b1.termCalled);
+		}
+	}
+
+	public function testParallelSucceedRequireAll()
+	{
+		var b1 = new MockBehavior();
+		var b2 = new MockBehavior();
+		var parallel = new Parallel(RequireAll, RequireOne);
+		parallel.addChild(b1);
+		parallel.addChild(b2);
+
+		assertEquals(Running, parallel.tick());
+		b1.returnStatus = Success;
+		assertEquals(Running, parallel.tick());
+		b2.returnStatus = Success;
+		assertEquals(Success, parallel.tick());
+	}
+
+	public function testParallelSucceedRequireOne()
+	{
+		var b1 = new MockBehavior();
+		var b2 = new MockBehavior();
 		var parallel = new Parallel(RequireOne, RequireAll);
+		parallel.addChild(b1);
+		parallel.addChild(b2);
+
+		assertEquals(Running, parallel.tick());
+		b1.returnStatus = Success;
+		assertEquals(Success, parallel.tick());
+	}
+
+	public function testParallelFailureRequireAll()
+	{
+		var b1 = new MockBehavior();
+		var b2 = new MockBehavior();
+		var parallel = new Parallel(RequireOne, RequireAll);
+		parallel.addChild(b1);
+		parallel.addChild(b2);
+
+		assertEquals(Running, parallel.tick());
+		b1.returnStatus = Failure;
+		assertEquals(Running, parallel.tick());
+		b2.returnStatus = Failure;
 		assertEquals(Failure, parallel.tick());
+	}
+
+	public function testParallelFailureRequireOne()
+	{
+		var b1 = new MockBehavior();
+		var b2 = new MockBehavior();
+		var parallel = new Parallel(RequireAll, RequireOne);
+		parallel.addChild(b1);
+		parallel.addChild(b2);
+
+		assertEquals(Running, parallel.tick());
+		b1.returnStatus = Failure;
+		assertEquals(Failure, parallel.tick());
+	}
+
+	public function testActiveSelector()
+	{
+		var selector = new ActiveSelector();
+		var b1 = new MockBehavior(Failure);
+		selector.addChild(b1);
+		var b2 = new MockBehavior(Running);
+		selector.addChild(b2);
+
+		assertEquals(Running, selector.tick());
+		assertEquals(1, b1.initCalled);
+		assertEquals(1, b1.termCalled);
+		assertEquals(1, b2.initCalled);
+		assertEquals(0, b2.termCalled);
+
+		assertEquals(Running, selector.tick());
+		assertEquals(2, b1.initCalled);
+		assertEquals(2, b1.termCalled);
+		assertEquals(1, b2.initCalled);
+		assertEquals(0, b2.termCalled);
+
+		b1.returnStatus = Running;
+		assertEquals(Running, selector.tick());
+		assertEquals(3, b1.initCalled);
+		assertEquals(2, b1.termCalled);
+		assertEquals(1, b2.initCalled);
+		assertEquals(1, b2.termCalled);
+
+		b1.returnStatus = Success;
+		assertEquals(Success, selector.tick());
+		assertEquals(3, b1.initCalled);
+		assertEquals(3, b1.termCalled);
+		assertEquals(1, b2.initCalled);
+		assertEquals(1, b2.termCalled);
 	}
 
 }
