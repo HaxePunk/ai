@@ -76,8 +76,7 @@ class TestBehaviors extends haxe.unit.TestCase
 	public function testRepeat()
 	{
 		var behavior = new MockBehavior(Success);
-		var repeat = new Repeat(behavior);
-		repeat.count = 4;
+		var repeat = new Repeat(behavior, 4);
 		assertEquals(Success, repeat.tick());
 		assertEquals(4, behavior.initCalled);
 	}
