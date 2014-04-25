@@ -10,7 +10,6 @@ enum PathOptimize
 {
 	None;
 	SlopeMatch;
-	LineOfSight;
 }
 
 /**
@@ -19,7 +18,7 @@ enum PathOptimize
 typedef PathOptions = {
 	/** The heuristic to use for path finding (default: Heuristic.manhattan) */
 	@:optional public var heuristic:HeuristicFunction;
-	/** Generates an optimized path list, removes identical slopes (default:true) */
+	/** Generates an optimized path list, removes identical slopes (default:None) */
 	@:optional public var optimize:PathOptimize;
 };
 
@@ -91,6 +90,7 @@ class NodeGraph
 			if (!grid.getTile(x, y))
 			{
 				var node = getNode(x, y);
+				// add neighbors
 				node.addNeighbor(getNode(x    , y - 1), HORIZONTAL_COST);
 				node.addNeighbor(getNode(x    , y + 1), HORIZONTAL_COST);
 				node.addNeighbor(getNode(x - 1, y    ), HORIZONTAL_COST);
@@ -104,7 +104,6 @@ class NodeGraph
 					node.addNeighbor(getNode(x + 1, y + 1), DIAGONAL_COST);
 				}
 				addNode(node);
-				// add neighbors
 			}
 		}
 	}
@@ -217,12 +216,6 @@ class NodeGraph
 						}
 						node = node.parent;
 					}
-				}
-			case LineOfSight:
-				path.push(node);
-				if (node.parent != null)
-				{
-
 				}
 		}
 
