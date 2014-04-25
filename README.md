@@ -1,7 +1,7 @@
 ## How to use
 ```haxe
-import com.haxepunk.ai.NodeGraph;
-import com.haxepunk.ai.PathNode;
+import com.haxepunk.ai.path.NodeGraph;
+import com.haxepunk.ai.path.PathNode;
 import com.haxepunk.Entity;
 import com.haxepunk.masks.Grid;
 import com.haxepunk.tweens.LinearMotion;
