@@ -6,6 +6,7 @@ class TestMain
 	{
 		var r = new TestRunner();
 		r.add(new TestBehaviors());
+		r.add(new TestNodeGraph());
 		r.run();
 	}
 }

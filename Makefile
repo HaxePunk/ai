@@ -1,4 +1,4 @@
-all: unit
+all: unit example
 
 unit:
 	cd tests && haxe compile.hxml && neko unit.n

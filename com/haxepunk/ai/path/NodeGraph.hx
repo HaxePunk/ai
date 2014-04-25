@@ -1,14 +1,16 @@
 package com.haxepunk.ai.path;
 
+import com.haxepunk.HXP;
 import com.haxepunk.masks.Grid;
 import com.haxepunk.ai.path.Heuristic;
 import com.haxepunk.ds.PriorityQueue;
+import haxe.ds.IntMap;
 
 enum PathOptimize
 {
-	NONE;
-	SLOPE_MATCH;
-	LINE_OF_SIGHT;
+	None;
+	SlopeMatch;
+	LineOfSight;
 }
 
 /**
@@ -32,32 +34,15 @@ class NodeGraph
 	 * @param grid the Grid mask to use for path info
 	 * @param options a set of options that determine how paths are generated
 	 */
-	public function new()
+	public function new(?options:PathOptions)
 	{
 		nodes = new Array<PathNode>();
 		openList = new PriorityQueue<PathNode>();
-		closedList = new Array<PathNode>();
-	}
-
-	public function fromGrid(grid:Grid, allowDiagonal:Bool=false, ?options:PathOptions)
-	{
-		// build node list
-		width = Std.int(grid.width / grid.tileWidth);
-		height = Std.int(grid.height / grid.tileHeight);
-		var x:Int, y:Int;
-		for (i in 0...(width * height))
-		{
-			x = i % width;
-			y = Std.int(i / width);
-			if (!grid.getTile(x, y)) {
-				nodes.push(new PathNode(x, y));
-				// add neighbors
-			}
-		}
+		closedList = new List<PathNode>();
 
 		// set defaults
 		heuristic = Heuristic.manhattan;
-		optimize = PathOptimize.SLOPE_MATCH;
+		optimize = PathOptimize.None;
 
 		if (options != null)
 		{
@@ -66,6 +51,61 @@ class NodeGraph
 
 			if (Reflect.hasField(options, "optimize"))
 				optimize = options.optimize;
+		}
+	}
+
+	public inline function addNode(node:PathNode)
+	{
+		nodes.push(node);
+	}
+
+	public function fromGrid(grid:Grid, allowDiagonal:Bool=false)
+	{
+		// build node list
+		width = Std.int(grid.width / grid.tileWidth);
+		height = Std.int(grid.height / grid.tileHeight);
+		var x:Int, y:Int;
+		var size:Int = width * height;
+		var map = new IntMap<PathNode>();
+
+		var getNode = function(x:Int, y:Int):PathNode {
+			var node:PathNode;
+			var index:Int = y * width + x;
+			if (index < 0 || index > size) return null;
+			if (map.exists(index))
+			{
+				node = map.get(index);
+			}
+			else
+			{
+				node = new PathNode(x, y);
+				map.set(index, node);
+			}
+			return node;
+		};
+
+		for (i in 0...size)
+		{
+			x = i % width;
+			y = Std.int(i / width);
+			if (!grid.getTile(x, y))
+			{
+				var node = getNode(x, y);
+				node.addNeighbor(getNode(x    , y - 1), HORIZONTAL_COST);
+				node.addNeighbor(getNode(x    , y + 1), HORIZONTAL_COST);
+				node.addNeighbor(getNode(x - 1, y    ), HORIZONTAL_COST);
+				node.addNeighbor(getNode(x + 1, y    ), HORIZONTAL_COST);
+
+				if (allowDiagonal)
+				{
+					node.addNeighbor(getNode(x - 1, y - 1), DIAGONAL_COST);
+					node.addNeighbor(getNode(x + 1, y - 1), DIAGONAL_COST);
+					node.addNeighbor(getNode(x - 1, y + 1), DIAGONAL_COST);
+					node.addNeighbor(getNode(x + 1, y + 1), DIAGONAL_COST);
+				}
+				addNode(node);
+				// add neighbors
+			}
 		}
 	}
 
@@ -97,29 +137,29 @@ class NodeGraph
 			}
 
 			// push the node to the closed list
-			closedList.push(node);
+			closedList.add(node);
 
 			// check all the neighbors
 			for (neighbor in node.neighbors)
 			{
-				if (Lambda.has(closedList, neighbor))
+				var n = neighbor.node;
+				if (Lambda.has(closedList, n))
 				{
 					continue;
 				}
 				else
 				{
-					var cost = HXP.distance(node.x, node.y, neighbor.x, neighbor.y);
-					var g = node.g + cost;
-					if (g < neighbor.g || neighbor.parent == null)
+					var g = node.g + HXP.distance(node.x, node.y, n.x, n.y);
+					if (g < n.g || n.parent == null)
 					{
-						neighbor.g = g;
-						neighbor.h = heuristic(neighbor.x, neighbor.y, dx, dy) * HORIZONTAL_COST;
-						neighbor.parent = node;
+						n.g = g;
+						n.h = heuristic(n.x, n.y, dx, dy) * neighbor.cost;
+						n.parent = node;
 
 						// remove the node if it exists on the open list
-						openList.remove(neighbor);
+						openList.remove(n);
 						// enqueue the node with the new priority
-						openList.enqueue(neighbor, Std.int(neighbor.g + neighbor.h));
+						openList.enqueue(n, Std.int(n.g + n.h));
 					}
 				}
 			}
@@ -148,13 +188,13 @@ class NodeGraph
 		// optimized list skips nodes with the same slope
 		switch (optimize)
 		{
-			case NONE:
+			case None:
 				while (node != null)
 				{
 					path.insert(0, node);
 					node = node.parent;
 				}
-			case SLOPE_MATCH:
+			case SlopeMatch:
 				path.push(node);
 				// check if this is the only node
 				if (node.parent != null)
@@ -178,7 +218,7 @@ class NodeGraph
 						node = node.parent;
 					}
 				}
-			case LINE_OF_SIGHT:
+			case LineOfSight:
 				path.push(node);
 				if (node.parent != null)
 				{
@@ -191,12 +231,8 @@ class NodeGraph
 
 	private function reset()
 	{
-// clear out any old data we had
-#if (cpp || php)
-		closedList.splice(0,closedList.length);
-#else
-		untyped closedList.length = 0;
-#end
+		// clear out any old data we had
+		closedList.clear();
 		openList.clear();
 
 		for (i in 0...nodes.length)
@@ -210,7 +246,7 @@ class NodeGraph
 	 */
 	private inline function getClosestNode(x:Float, y:Float):PathNode
 	{
-		var closestDist:Float = 999999999;
+		var closestDist:Float = HXP.NUMBER_MAX_VALUE;
 		var closest:PathNode = null;
 		for (node in nodes)
 		{
@@ -232,8 +268,9 @@ class NodeGraph
 
 	private var nodes:Array<PathNode>;
 	private var openList:PriorityQueue<PathNode>;
-	private var closedList:Array<PathNode>;
+	private var closedList:List<PathNode>;
 
 	private static inline var HORIZONTAL_COST:Int = 10;
+	private static inline var DIAGONAL_COST:Int = 14;
 
 }
