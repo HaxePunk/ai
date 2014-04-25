@@ -21,14 +21,14 @@ class AIEntity extends Entity
 		graphic = image;
 
 		var sequence = new Sequence();
-		sequence.addChild(new Action(keyPressed));
-		sequence.addChild(new Action(followMouse));
+		sequence.addChild(new Action("keyPressed"));
+		sequence.addChild(new Action("followMouse"));
 		behavior.addChild(sequence);
 	}
 
 	override public function update()
 	{
-		behavior.tick();
+		behavior.tick(this);
 		super.update();
 	}
 

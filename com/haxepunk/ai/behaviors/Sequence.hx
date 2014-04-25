@@ -12,11 +12,11 @@ class Sequence extends Composite
 		_currentBehavior = _current.next();
 	}
 
-	override private function update():BehaviorStatus
+	override private function update(context:Dynamic):BehaviorStatus
 	{
 		while (_currentBehavior != null)
 		{
-			var status = _currentBehavior.tick();
+			var status = _currentBehavior.tick(context);
 
 			// if the child fails, or keeps running, do the same.
 			if (status != Success)

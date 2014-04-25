@@ -27,7 +27,7 @@ class Parallel extends Composite
 		_failurePolicy = failure;
 	}
 
-	override private function update():BehaviorStatus
+	override private function update(context:Dynamic):BehaviorStatus
 	{
 		var successCount:Int = 0,
 			failureCount:Int = 0;
@@ -36,7 +36,7 @@ class Parallel extends Composite
 		{
 			if (!child.terminated)
 			{
-				child.tick();
+				child.tick(context);
 			}
 
 			switch (child.status)

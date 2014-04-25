@@ -27,11 +27,11 @@ class Repeat extends Decorator
 		_counter = 0;
 	}
 
-	override private function update():BehaviorStatus
+	override private function update(context:Dynamic):BehaviorStatus
 	{
 		while(true)
 		{
-			switch (child.tick())
+			switch (child.tick(context))
 			{
 				case Running:
 					break;

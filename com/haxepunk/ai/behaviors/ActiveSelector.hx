@@ -16,12 +16,12 @@ class ActiveSelector extends Selector
 		}
 	}
 
-	override private function update():BehaviorStatus
+	override private function update(context:Dynamic):BehaviorStatus
 	{
 		var previousBehavior:Behavior = _currentBehavior;
 
 		super.initialize();
-		var result = super.update();
+		var result = super.update(context);
 
 		if (_currentBehavior != previousBehavior)
 		{

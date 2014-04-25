@@ -1,7 +1,5 @@
 package com.haxepunk.ai.behaviors;
 
-typedef ActionMethod = Void->BehaviorStatus;
-
 /**
  * An action specifies a function to be called when updating
  */
@@ -12,17 +10,22 @@ class Action extends Behavior
 	 * Action constructor
 	 * @param action the callback method when this behavior runs
 	 */
-	public function new(action:ActionMethod)
+	public function new(action:String)
 	{
 		super();
 		this.action = action;
 	}
 
-	override public function update():BehaviorStatus
+	override public function update(context:Dynamic):BehaviorStatus
 	{
-		return action();
+		var f = Reflect.field(context, action);
+		if (f != null)
+		{
+			return Reflect.callMethod(context, f, []);
+		}
+		return Failure;
 	}
 
-	private var action:ActionMethod;
+	private var action:String;
 
 }

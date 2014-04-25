@@ -29,7 +29,7 @@ class Behavior
 	 * Called when the behavior updates (should be overridden in sub classes)
 	 * @return The behavior status from that update
 	 */
-	private function update():BehaviorStatus { return status; }
+	private function update(context:Dynamic):BehaviorStatus { return status; }
 
 	/**
 	 * Specifies if the behavior is terminated
@@ -70,14 +70,14 @@ class Behavior
 	 * Advances the behavior logic (initializes, updates, and terminates when necessary)
 	 * @return The behavior status
 	 */
-	public function tick():BehaviorStatus
+	public function tick(?context:Dynamic):BehaviorStatus
 	{
 		if (status != Running)
 		{
 			initialize();
 		}
 
-		status = update();
+		status = update(context);
 
 		if (status != Running)
 		{

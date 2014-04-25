@@ -32,7 +32,7 @@ class MockBehavior extends Behavior
 		termStatus = status;
 	}
 
-	override public function update():BehaviorStatus
+	override public function update(context:Dynamic):BehaviorStatus
 	{
 		updateCalled += 1;
 		return returnStatus;
