@@ -1,7 +1,7 @@
 ## How to use
 ```haxe
-import com.haxepunk.ai.GridPath;
-import com.haxepunk.ai.PathNode;
+import com.haxepunk.ai.path.NodeGraph;
+import com.haxepunk.ai.path.PathNode;
 import com.haxepunk.Entity;
 import com.haxepunk.masks.Grid;
 import com.haxepunk.tweens.LinearMotion;
@@ -13,10 +13,8 @@ class PathEntity extends Entity
 		super();
 
 		// create the ai node graph
-		var graph = new GridPath(grid, {
-			walkDiagonal: true,
-			optimize: LineOfSight
-		});
+		var graph = new NodeGraph({ optimize: SlopeMatch });
+		graph.fromGrid(grid, true /* allow diagonals */);
 
 		// tween to handle path movement
 		pathTween = var LinearTween(moveToNextNode, TweenType.PERSIST);

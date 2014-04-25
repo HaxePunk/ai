@@ -2,7 +2,7 @@ package scenes;
 
 import com.haxepunk.Scene;
 import com.haxepunk.masks.Grid;
-import com.haxepunk.ai.path.GridPath;
+import com.haxepunk.ai.path.NodeGraph;
 import com.haxepunk.ai.path.PathNode;
 import com.haxepunk.utils.Draw;
 import com.haxepunk.utils.Input;
@@ -47,7 +47,8 @@ class Pathfinding extends Scene
 		}
 
 		addMask(grid, "solid");
-		astar = new GridPath(grid);
+		graph = new NodeGraph({optimize:SlopeMatch});
+		graph.fromGrid(grid);
 	}
 
 	public override function update()
@@ -62,7 +63,7 @@ class Pathfinding extends Scene
 			}
 			else
 			{
-				path = astar.search(Std.int(start.x), Std.int(start.y), Std.int(x), Std.int(y));
+				path = graph.search(Std.int(start.x), Std.int(start.y), Std.int(x), Std.int(y));
 				start = null;
 			}
 		}
@@ -84,7 +85,7 @@ class Pathfinding extends Scene
 
 		if (path != null)
 		{
-			var last = null;
+			var last:PathNode = null;
 			for (node in path)
 			{
 				var x = Std.int(node.x * grid.tileWidth + grid.tileWidth / 2),
@@ -96,7 +97,7 @@ class Pathfinding extends Scene
 						Std.int(node.x * grid.tileWidth + grid.tileWidth / 2),
 						Std.int(node.y * grid.tileHeight + grid.tileHeight / 2));
 				}
-				Draw.text(node.g + " " + node.h, x, y);
+				Draw.text(Math.round(node.g) + " " + Math.round(node.h), x, y);
 				Draw.circle(x, y, 3);
 				last = node;
 			}
@@ -107,6 +108,7 @@ class Pathfinding extends Scene
 	private var start:Point;
 
 	private var grid:Grid;
-	private var astar:GridPath;
+	private var graph:NodeGraph;
 	private var path:Array<PathNode>;
+
 }

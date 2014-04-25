@@ -1,25 +1,36 @@
 package com.haxepunk.ai.path;
 
+typedef Neighbor = {
+	var node:PathNode;
+	var cost:Int;
+}
+
 class PathNode
 {
-	public var x:Int;
-	public var y:Int;
-	public var worldX:Float;
-	public var worldY:Float;
+	public var x:Float = 0;
+	public var y:Float = 0;
 
-	public var g:Int;
-	public var h:Int;
+	public var g:Float = 0;
+	public var h:Float = 0;
 
-	public var walkable:Bool;
 	public var parent:PathNode;
+	public var neighbors:List<Neighbor>;
 
-	public function new(x:Int, y:Int, parent:PathNode=null)
+	public function new(x:Float, y:Float, parent:PathNode=null)
 	{
 		this.x = x;
 		this.y = y;
 		this.parent = parent;
+		neighbors = new List<Neighbor>();
+	}
 
-		g = h = 0;
+	public inline function addNeighbor(node:PathNode, cost:Int)
+	{
+		if (node == null) return;
+		neighbors.add({
+			node: node,
+			cost: cost
+		});
 	}
 
 	public function toString():String

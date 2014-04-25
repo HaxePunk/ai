@@ -8,6 +8,7 @@ class TestMain
 		r.add(new TestVector());
 		r.add(new TestSteering());
 		r.add(new TestBehaviors());
+		r.add(new TestNodeGraph());
 		r.run();
 	}
 }

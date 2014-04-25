@@ -26,7 +26,7 @@ class PriorityQueue<T>
 			priority: priority
 		};
 
-		if (_items.length == 0)
+		if (length == 0)
 		{
 			_items.push(obj);
 		}
@@ -48,13 +48,14 @@ class PriorityQueue<T>
 	/**
 	 * Check if an item exists in the queue  O(n)
 	 */
-	public function remove(value:T)
+	public function remove(value:T):Void
 	{
 		for (item in _items)
 		{
 			if (item.value == value)
 			{
 				_items.remove(item);
+				break;
 			}
 		}
 	}
@@ -62,7 +63,7 @@ class PriorityQueue<T>
 	/**
 	 * Removes all items from the queue
 	 */
-	public function clear()
+	public function clear():Void
 	{
 #if (cpp || php)
 		_items.splice(0, _items.length);
@@ -84,15 +85,13 @@ class PriorityQueue<T>
 		return "[" + items.join(", ") + "]";
 	}
 
+	/**
+	 * Returns the number of items in the queue
+	 */
 	public var length(get_length, never):Int;
-	private function get_length():Int
+	private inline function get_length():Int
 	{
 		return _items.length;
-	}
-
-	private inline function midpoint(min:Int, max:Int):Int
-	{
-		return min + Std.int((max - min) / 2);
 	}
 
 	/**
@@ -100,10 +99,10 @@ class PriorityQueue<T>
 	 */
 	private function search(priority:Int):Int
 	{
-		var mid:Int, min:Int = 0, max:Int = _items.length - 1;
+		var mid:Int, min:Int = 0, max:Int = length - 1;
 		while (max >= min)
 		{
-			mid = midpoint(min, max);
+			mid = min + Std.int((max - min) / 2);
 			if (_items[mid].priority < priority)
 				min = mid + 1;
 			else if (_items[mid].priority > priority)
