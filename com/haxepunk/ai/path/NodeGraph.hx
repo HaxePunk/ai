@@ -6,10 +6,13 @@ import com.haxepunk.ai.path.Heuristic;
 import com.haxepunk.ds.PriorityQueue;
 import haxe.ds.IntMap;
 
+/**
+ * Optimization options for path traversal
+ */
 enum PathOptimize
 {
-	None;
-	SlopeMatch;
+	None; /** no optimization **/
+	SlopeMatch; /** any nodes with matching slopes are dropped **/
 }
 
 /**
@@ -29,8 +32,7 @@ class NodeGraph
 {
 
 	/**
-	 * Creates a GridPath class
-	 * @param grid the Grid mask to use for path info
+	 * NodeGraph constructor
 	 * @param options a set of options that determine how paths are generated
 	 */
 	public function new(?options:PathOptions)
@@ -53,12 +55,20 @@ class NodeGraph
 		}
 	}
 
-	public inline function addNode(node:PathNode)
+	/**
+	 * Adds a node to the graph
+	 */
+	public inline function addNode(node:PathNode):Void
 	{
 		nodes.push(node);
 	}
 
-	public function fromGrid(grid:Grid, allowDiagonal:Bool=false)
+	/**
+	 * Builds a graph from a Grid object
+	 * @param grid the grid object to use for generation (open spaces are considered nodes)
+	 * @param allowDiagonal whether to allow diagonal movement on the grid
+	 */
+	public function fromGrid(grid:Grid, allowDiagonal:Bool=false):Void
 	{
 		// build node list
 		width = Std.int(grid.width / grid.tileWidth);
@@ -169,6 +179,7 @@ class NodeGraph
 
 	/**
 	 * Calculates the slope between two nodes
+	 * @return the slope between two nodes
 	 */
 	private inline function calcSlope(a:PathNode, b:PathNode):Float
 	{
@@ -222,6 +233,9 @@ class NodeGraph
 		return path;
 	}
 
+	/**
+	 * Clears the open and closed lists
+	 */
 	private function reset()
 	{
 		// clear out any old data we had
