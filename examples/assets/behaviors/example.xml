@@ -1,0 +1,7 @@
+<?xml version=\"1.0\"?>
+<tree>
+	<sequence>
+		<action>keyPressed</action>
+		<action>followMouse</action>
+	</sequence>
+</tree>

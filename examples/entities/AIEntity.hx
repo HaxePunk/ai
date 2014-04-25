@@ -11,7 +11,7 @@ class AIEntity extends Entity
 	public function new()
 	{
 		super();
-		behavior = new Selector();
+		behavior = BehaviorTree.fromXml(openfl.Assets.getText("assets/behaviors/example.xml"));
 	}
 
 	override public function added()
@@ -19,11 +19,6 @@ class AIEntity extends Entity
 		var image = Image.createCircle(8);
 		image.centerOrigin();
 		graphic = image;
-
-		var sequence = new Sequence();
-		sequence.addChild(new Action("keyPressed"));
-		sequence.addChild(new Action("followMouse"));
-		behavior.addChild(sequence);
 	}
 
 	override public function update()

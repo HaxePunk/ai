@@ -10,4 +10,6 @@
 
 	<haxelib name="HaxePunk" />
 	<haxelib name="HaxePunkAI" />
+
+	<assets path="assets" />
 </project>
