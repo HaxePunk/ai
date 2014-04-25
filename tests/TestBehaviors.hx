@@ -53,6 +53,29 @@ class TestBehaviors extends haxe.unit.TestCase
 		assertEquals(1, behavior.initCalled);
 	}
 
+	public function testBehaviorXml()
+	{
+		var xml = '<?xml version="1.0"?>
+<tree>
+	<action>doAction</action>
+	<sequence>
+		<action>followMouse</action>
+		<parallel success="one" failure="all">
+			<repeat count="4">
+				<action>doStuff</action>
+			</repeat>
+			<selector>
+				<action>lookHere</action>
+				<action>lookThere</action>
+			</selector>
+		</parallel>
+	</sequence>
+	<action>performAction</action>
+</tree>';
+		var selector = BehaviorTree.fromXml(xml);
+		assertEquals(Failure, selector.tick());
+	}
+
 	public function testBehaviorUpdate()
 	{
 		var behavior = new MockBehavior();

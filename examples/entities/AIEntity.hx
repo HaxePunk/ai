@@ -34,8 +34,8 @@ class AIEntity extends Entity
 
 	public function followMouse():BehaviorStatus
 	{
-		var x = HXP.scene.mouseX,
-			y = HXP.scene.mouseY;
+		var x = scene.mouseX,
+			y = scene.mouseY;
 
 		if (this.x == x && this.y == y) return Success;
 

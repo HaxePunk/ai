@@ -19,9 +19,13 @@ class Action extends Behavior
 	override public function update(context:Dynamic):BehaviorStatus
 	{
 		var f = Reflect.field(context, action);
-		if (f != null)
+		if (Reflect.isFunction(f))
 		{
-			return Reflect.callMethod(context, f, []);
+			var result = Reflect.callMethod(context, f, []);
+			if (Std.is(result, BehaviorStatus))
+			{
+				return result;
+			}
 		}
 		return Failure;
 	}
