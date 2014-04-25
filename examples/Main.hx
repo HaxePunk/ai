@@ -14,7 +14,7 @@ class Main extends Engine
 			HXP.console.enable();
 		}
 #end
-		HXP.scene = new scenes.Pathfinding();
+		HXP.scene = new scenes.Behaviors();
 	}
 
 	public static function main()

@@ -63,7 +63,7 @@ class Pathfinding extends Scene
 			}
 			else
 			{
-				path = graph.search(Std.int(start.x), Std.int(start.y), Std.int(x), Std.int(y));
+				path = graph.search(start.x, start.y, x, y);
 				start = null;
 			}
 		}
