@@ -108,10 +108,16 @@ class NodeGraph
 
 				if (allowDiagonal)
 				{
-					node.addNeighbor(getNode(x - 1, y - 1), DIAGONAL_COST);
-					node.addNeighbor(getNode(x + 1, y - 1), DIAGONAL_COST);
-					node.addNeighbor(getNode(x - 1, y + 1), DIAGONAL_COST);
-					node.addNeighbor(getNode(x + 1, y + 1), DIAGONAL_COST);
+                    if(!grid.getTile(x, y - 1))
+                    {
+                        if(!grid.getTile(x - 1, y)) node.addNeighbor(getNode(x - 1, y - 1), DIAGONAL_COST);
+                        if(!grid.getTile(x + 1, y)) node.addNeighbor(getNode(x + 1, y - 1), DIAGONAL_COST);
+                    }
+                    if(!grid.getTile(x, y + 1))
+                    {
+                        if(!grid.getTile(x - 1, y)) node.addNeighbor(getNode(x - 1, y + 1), DIAGONAL_COST);
+                        if(!grid.getTile(x + 1, y)) node.addNeighbor(getNode(x + 1, y + 1), DIAGONAL_COST);
+                    }
 				}
 				addNode(node);
 			}
